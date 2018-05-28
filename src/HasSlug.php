@@ -36,7 +36,7 @@ trait HasSlug
     {
         $this->slugOptions = $this->getSlugOptions();
 
-        if (! $this->slugOptions->generateSlugsOnCreate) {
+        if (!$this->slugOptions->generateSlugsOnCreate) {
             return;
         }
 
@@ -50,7 +50,7 @@ trait HasSlug
     {
         $this->slugOptions = $this->getSlugOptions();
 
-        if (! $this->slugOptions->generateSlugsOnUpdate) {
+        if (!$this->slugOptions->generateSlugsOnUpdate) {
             return;
         }
 
@@ -88,7 +88,7 @@ trait HasSlug
     /**
      * Generate a non unique slug for this record.
      */
-    protected function generateNonUniqueSlug(): string
+    protected function generateNonUniqueSlug()
     {
         if ($this->hasCustomSlugBeenUsed()) {
             $slugField = $this->slugOptions->slugField;
@@ -96,7 +96,16 @@ trait HasSlug
             return $this->$slugField;
         }
 
-        return Str::slug($this->getSlugSourceString(), $this->slugOptions->slugSeparator, $this->slugOptions->slugLanguage);
+
+        $slug = $this->getSlugSource();
+        if (is_array($slug)) {
+            foreach ($slug as $lang => &$slugItem) {
+                $slugItem = Str::slug($slugItem, $this->slugOptions->slugSeparator, $lang);
+            }
+        } else {
+            $slug = Str::slug($slug, $this->slugOptions->slugSeparator, $this->slugOptions->slugLanguage);
+        }
+        return $slug;
     }
 
     /**
@@ -112,16 +121,26 @@ trait HasSlug
     /**
      * Get the string that should be used as base for the slug.
      */
-    protected function getSlugSourceString(): string
+    protected function getSlugSource()
     {
-        if (is_callable($this->slugOptions->generateSlugFrom)) {
+        if (
+            !empty($this->translatable)
+            && in_array($this->slugOptions->generateSlugFrom[0], $this->translatable)
+            && method_exists($this, 'getTranslations')
+        ) {
+            $slugSource = $this->getTranslations($this->slugOptions->generateSlugFrom[0]);
+            foreach ($slugSource as &$item) {
+                $item = substr($item, 0, $this->slugOptions->maximumLength);
+            }
+            return $slugSource;
+        } elseif (is_callable($this->slugOptions->generateSlugFrom)) {
             $slugSourceString = call_user_func($this->slugOptions->generateSlugFrom, $this);
 
             return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
         }
 
         $slugSourceString = collect($this->slugOptions->generateSlugFrom)
-            ->map(function (string $fieldName) : string {
+            ->map(function (string $fieldName): string {
                 return $this->$fieldName ?? '';
             })
             ->implode($this->slugOptions->slugSeparator);
@@ -132,13 +151,29 @@ trait HasSlug
     /**
      * Make the given slug unique.
      */
-    protected function makeSlugUnique(string $slug): string
+    protected function makeSlugUnique($slug)
+    {
+        if (is_array($slug)) {
+            foreach ($slug as $lang => &$slugItem) {
+                $slugItem = $this->makeSlugStringUnique($slugItem, $lang);
+            }
+        } else {
+            $slug = $this->makeSlugStringUnique($slug);
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Make the given slug string unique.
+     */
+    protected function makeSlugStringUnique(string $slug, $lang = null): string
     {
         $originalSlug = $slug;
         $i = 1;
 
-        while ($this->otherRecordExistsWithSlug($slug) || $slug === '') {
-            $slug = $originalSlug.$this->slugOptions->slugSeparator.$i++;
+        while ($this->otherRecordExistsWithSlug($slug, $lang) || $slug === '') {
+            $slug = $originalSlug . $this->slugOptions->slugSeparator . $i++;
         }
 
         return $slug;
@@ -147,7 +182,7 @@ trait HasSlug
     /**
      * Determine if a record exists with the given slug.
      */
-    protected function otherRecordExistsWithSlug(string $slug): bool
+    protected function otherRecordExistsWithSlug(string $slug, string $lang = null): bool
     {
         $key = $this->getKey();
 
@@ -155,7 +190,7 @@ trait HasSlug
             $key = $key ?? '0';
         }
 
-        return (bool) static::where($this->slugOptions->slugField, $slug)
+        return (bool)static::where($this->slugOptions->slugField . ($lang ? "->$lang" : ''), $slug)
             ->where($this->getKeyName(), '!=', $key)
             ->withoutGlobalScopes()
             ->first();
@@ -166,11 +201,11 @@ trait HasSlug
      */
     protected function guardAgainstInvalidSlugOptions()
     {
-        if (is_array($this->slugOptions->generateSlugFrom) && ! count($this->slugOptions->generateSlugFrom)) {
+        if (is_array($this->slugOptions->generateSlugFrom) && !count($this->slugOptions->generateSlugFrom)) {
             throw InvalidOption::missingFromField();
         }
 
-        if (! strlen($this->slugOptions->slugField)) {
+        if (!strlen($this->slugOptions->slugField)) {
             throw InvalidOption::missingSlugField();
         }
 

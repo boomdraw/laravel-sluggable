@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-sluggable` will be documented in this file
 
+## 2.1.3.1 - 2018-05-28
+
+- add translatable slug support with spatie/laravel-translatable
+
 ## 2.1.3 - 2018-02-15
 
 - fix for models with non incrementing primary keys

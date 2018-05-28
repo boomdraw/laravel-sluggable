@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-sluggable",
+    "name": "boomdraw/laravel-sluggable",
     "description": "Generate slugs when saving Eloquent models",
     "keywords": [
         "spatie",

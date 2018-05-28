@@ -1,11 +1,10 @@
 # Generate slugs when saving Eloquent models
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-sluggable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sluggable)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/spatie/laravel-sluggable/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-sluggable)
-[![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-sluggable.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-sluggable)
-[![StyleCI](https://styleci.io/repos/48512561/shield?branch=master)](https://styleci.io/repos/48512561)
-[![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-sluggable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sluggable)
+## Fork notes:
+
+Package was updated for using translatable slug with [spatie/laravel-translatable](https://github.com/spatie/laravel-translatable).
+
+##
 
 This package provides a trait that will generate a unique slug when saving any Eloquent model. 
 
@@ -23,9 +22,22 @@ Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview 
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via composer. Add to composer file:
+```json
+"require": {
+    "boomdraw/laravel-sluggable": "^2.1"
+},
+"repositories": [
+    {
+        "type": "git",
+       	"url": "https://github.com/boomdraw/laravel-sluggable"
+    }
+]
+```
+
+And run
 ``` bash
-composer require spatie/laravel-sluggable
+composer update
 ```
 
 ## Usage
