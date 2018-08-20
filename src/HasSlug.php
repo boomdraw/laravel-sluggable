@@ -114,7 +114,9 @@ trait HasSlug
     protected function hasCustomSlugBeenUsed(): bool
     {
         $slugField = $this->slugOptions->slugField;
-
+        if ($this->isSlugTranslatable()) {
+            return json_decode($this->getOriginal($slugField), true) != $this->getTranslations($slugField);
+        }
         return $this->getOriginal($slugField) != $this->$slugField;
     }
 
@@ -123,11 +125,7 @@ trait HasSlug
      */
     protected function getSlugSource()
     {
-        if (
-            !empty($this->translatable)
-            && in_array($this->slugOptions->generateSlugFrom[0], $this->translatable)
-            && method_exists($this, 'getTranslations')
-        ) {
+        if ($this->isSlugTranslatable()) {
             $slugSource = $this->getTranslations($this->slugOptions->generateSlugFrom[0]);
             foreach ($slugSource as &$item) {
                 $item = substr($item, 0, $this->slugOptions->maximumLength);
@@ -212,5 +210,15 @@ trait HasSlug
         if ($this->slugOptions->maximumLength <= 0) {
             throw InvalidOption::invalidMaximumLength();
         }
+    }
+
+    /**
+     * Determine if a slug translatable
+     */
+    private function isSlugTranslatable()
+    {
+        return !empty($this->translatable)
+            && in_array($this->slugOptions->generateSlugFrom[0], $this->translatable)
+            && method_exists($this, 'getTranslations');
     }
 }
