@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-sluggable` will be documented in this file
 
+## 2.1.4 - 2018-08-28
+
+- add support for Laravel 5.7
+
 ## 2.1.3.1 - 2018-05-28
 
 - add translatable slug support with spatie/laravel-translatable

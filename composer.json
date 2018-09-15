@@ -3,9 +3,10 @@
     "description": "Generate slugs when saving Eloquent models",
     "keywords": [
         "spatie",
+        "boomdraw",
         "laravel-sluggable"
     ],
-    "homepage": "https://github.com/spatie/laravel-sluggable",
+    "homepage": "https://github.com/boomdraw/laravel-sluggable",
     "license": "MIT",
     "authors": [
         {
@@ -13,16 +14,22 @@
             "email": "freek@spatie.be",
             "homepage": "https://spatie.be",
             "role": "Developer"
+        },
+		{
+            "name": "Ivan Slesarenko",
+            "email": "info@boomdraw.com",
+            "homepage": "https://boomdraw.com",
+            "role": "Developer"
         }
     ],
     "require": {
         "php" : ">=7.0.0",
-        "illuminate/database": "~5.5.0|~5.6.0",
-        "illuminate/support": "~5.5.0|~5.6.0"
+        "illuminate/database": "~5.5.0|~5.6.0|~5.7.0",
+        "illuminate/support": "~5.5.0|~5.6.0|~5.7.0"
 
     },
     "require-dev": {
-        "orchestra/testbench": "~3.5.0|~3.6.0",
+        "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0",
         "phpunit/phpunit": "^6.3|^7.0"
     },
     "autoload": {
